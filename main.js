@@ -3,8 +3,11 @@ var gl;
 var shaderProgram;
 var camera = {};
 var programInfo = {};
+var then = 0;
+var rotation = 0;
 var config = {
     twice: true,
+    rotate: false,
 };
 var particles = {
     num: 1 << 16,
@@ -44,6 +47,7 @@ var pNumController = gui.add(particles, 'num', 1 << 12, 1 << 18);
 gui.add(particles, 'ramp_ratio', 1.0, 25.0);
 gui.add(particles, 'perlin_ratio', 1.0, 5.0);
 gui.add(particles, 'force_multiply', 1.0, 5.0);
+gui.add(config, 'rotate');
 gui.add(config, 'twice');
 gui.add(sphere, 'render');
 var radiusController = gui.add(sphere, 'radius', 1.0, 5.0);
@@ -53,6 +57,7 @@ gui.add(sphere2, 'render');
 var radiusController2 = gui.add(sphere2, 'radius', 1.0, 5.0);
 var posXController2 = gui.add(sphere2, 'pos_x', -15.0, 15.0);
 var posYController2 = gui.add(sphere2, 'pos_y', -15.0, 15.0);
+
 
 pNumController.onChange(initParticles)
 posXController.onChange(() => { return initSphere(sphere); })
@@ -68,14 +73,27 @@ initSphere(sphere)
 initSphere(sphere2)
 initCamera()
 // renderSphere()
-renderLoop()
+requestAnimationFrame(renderLoop)
 // renderParticles()
 
-function renderLoop() {
+function renderLoop(now) {
     stats.begin();
+
+    now *= 0.001;
+    const dt = now - then;
+    then = now;
+    if (config.rotate) {
+        rotation += dt;
+        mat4.rotate(camera.modelViewMatrix,
+            camera.modelViewMatrix,
+            rotation * 0.0007,
+            [0, 1, 0]);
+    }
+
     renderParticles();
     if (sphere.render) renderSphere(sphere);
     if (config.twice && sphere2.render) renderSphere(sphere2);
+
     stats.end();
     requestAnimationFrame(renderLoop)
 }
