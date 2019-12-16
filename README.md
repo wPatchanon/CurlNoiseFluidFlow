@@ -1,6 +1,7 @@
 # Curl Noise Fluid Flow
 RealtimeCG Final Project
 
+## Member:
 Patchanon Warin 5931047921\
 Nithiwut Wilainuch 5931033021
 
