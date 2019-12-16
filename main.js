@@ -46,7 +46,7 @@ gui.add(particles, 'size', 0.5, 3.0);
 var pNumController = gui.add(particles, 'num', 1 << 12, 1 << 18);
 gui.add(particles, 'ramp_ratio', 1.0, 25.0);
 gui.add(particles, 'perlin_ratio', 1.0, 5.0);
-gui.add(particles, 'force_multiply', 1.0, 5.0);
+gui.add(particles, 'force_multiply', 0.0, 5.0);
 gui.add(config, 'rotate');
 gui.add(config, 'twice');
 gui.add(sphere, 'render');
@@ -323,16 +323,21 @@ function initShaders() {
         uniform mat4 uProjectionMatrix;
         uniform mat4 uModMat;
 
+        varying vec3 pos;
+
         void main(void) {
             gl_Position = uProjectionMatrix * uModelViewMatrix * uModMat * aPosition;
+            pos = normalize(aPosition.xyz);
         }
     `;
 
     const sphereFS = `
         precision mediump float;
 
+        varying vec3 pos;
         void main() {
-            gl_FragColor = vec4(0.4,0.4,0.4,1.0);
+            float c = 0.3 + abs(dot(pos.x,pos.z)) * 0.7;
+            gl_FragColor = vec4(c,c,c,1.0);
         }
     `;
 
